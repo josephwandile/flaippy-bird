@@ -452,9 +452,11 @@ if __name__ == '__main__':
     node_util.initialize()
     if os.path.isfile('path.json'):
         infile = open('path.json')
-        action_list = json.loads(infile)
+        action_list = json.load(infile)
     else:
         action_list = algs.search(structs.PriorityQueue, 450, lambda successor: algs.heuristic(successor))[0]
         outfile = open('path.json', 'w')
-        json.dumps(action_list, outfile)
-    main(agent=QLearner(ld=4))
+        dump = json.dumps(action_list, sort_keys=True, indent=2, separators=(',', ': '))
+        outfile.write(dump)
+    # main(agent=QLearner(ld=4))
+    main(action_list=action_list)

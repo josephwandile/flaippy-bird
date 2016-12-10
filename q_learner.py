@@ -29,11 +29,12 @@ class QLearner:
     def import_q_values(self, path):
         if os.path.isfile(path):
             with open(path) as infile:
-                return json.loads(infile)
+                return json.load(infile)
 
-    def dump_q_values(self, path):
+    def dump_q_values(self, path="training.json"):
         with open(path, 'w') as outfile:
-            json.dumps(self.q_values, outfile)
+            dump = json.dumps(self.q_values, sort_keys=True, indent=2, separators=(',', ': '))
+            outfile.write(dump)
 
     def get_current_epsilon(self):
         return max(1.0 / (self.episodes + 1.0), 0.01) if not self.epsilon else self.epsilon
@@ -117,7 +118,7 @@ class QLearner:
                  )
 
         if self.episodes % self.dump_interval == 0:
-            self.dump_q_values("training.pkl")
+            self.dump_q_values()
 
         if self.episodes == self.max_episodes + 1:
             sys.exit()
