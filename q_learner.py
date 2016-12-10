@@ -99,7 +99,7 @@ class QLearner:
         r = self.calculate_reward(s_)
         for t_ in range(t, t - n, -1):
             s, a = self.history[t_]
-            self.update(s, a, s_, r)
+            self.update(s, a, s_, r)  # BUG!
 
     def learn_from_episode(self):
         num_actions = len(self.history)
@@ -132,7 +132,7 @@ class QLearner:
         :param y_vel: vertical velocity
         """
         x_offset -= x_offset % 10 if x_offset <= 100 else x_offset % 100
-        y_offset -= y_offset % 10 if abs(y_offset) <= 150 else y_offset % 100
+        y_offset -= y_offset % 10 if abs(y_offset) <= 100 else y_offset % 100  # i.e. from -100 to 100
         return x_offset, y_offset, y_vel
 
     def take_action(self, game_state):

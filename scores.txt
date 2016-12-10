@@ -1,0 +1,6 @@
+Episode: 1, Score: 0
+Episode: 2, Score: 0
+Episode: 3, Score: 0
+Episode: 4, Score: 0
+Episode: 5, Score: 0
+Episode: 6, Score: 0

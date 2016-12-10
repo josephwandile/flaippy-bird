@@ -1,5 +1,11 @@
 # Flaippy Bird
 
+## RL Statespace
+* 10 by 10 grid of 10 by 10 units immediately in front of the next gap. 
+* More than 50 above or below the gap, the y-discretization increases to 100. 
+* 100 horizontal units before the next gap the x-discretization increases to 100.
+
+
 ## TODOs
 
 * Add command line args to define type of agent.
