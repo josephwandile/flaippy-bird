@@ -10,6 +10,7 @@ import structs
 import json
 import os
 from q_learner import QLearner
+import argparse
 
 PIPE_IND = 0
 FPS = 60
@@ -449,14 +450,34 @@ def get_hitmask(image):
 
 
 if __name__ == '__main__':
-    node_util.initialize()
-    if os.path.isfile('path.json'):
-        infile = open('path.json')
-        action_list = json.load(infile)
+
+    parser = argparse.ArgumentParser(description='Play FB, solve with informed search, or teach the bird with RL.')
+    parser.add_argument('-s', '--search', help='Solve with A*, then watch.', action='store_true')
+    parser.add_argument('-l', '--learn', help='Solve with TD-lambda, then watch.', action='store_true')
+    parser.add_argument('-w', '--weights', help='Upload previous solution', action='store_true')
+    args = vars(parser.parse_args())
+
+    if args['search']:
+        action_list = None
+        node_util.initialize()
+        if args['weights']:
+            if os.path.isfile('path.json'):
+                infile = open('path.json')
+                action_list = json.load(infile)
+            else:
+                action_list = algs.search(structs.PriorityQueue, 450, lambda successor: algs.heuristic(successor))[0]
+                outfile = open('path.json', 'w')
+                dump = json.dumps(action_list, sort_keys=True, indent=2, separators=(',', ': '))
+                outfile.write(dump)
+
+        main(action_list=action_list)
+
+    elif args['learn']:
+        path = None
+        if args['weights']:
+            path = 'training.json'
+
+        main(agent=QLearner(ld=4, path=path))
+
     else:
-        action_list = algs.search(structs.PriorityQueue, 450, lambda successor: algs.heuristic(successor))[0]
-        outfile = open('path.json', 'w')
-        dump = json.dumps(action_list, sort_keys=True, indent=2, separators=(',', ': '))
-        outfile.write(dump)
-    # main(agent=QLearner(ld=4))
-    main(action_list=action_list)
+        main()
