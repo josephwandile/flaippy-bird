@@ -1,7 +1,7 @@
 from collections import defaultdict
 import random
 import os
-import pickle
+import json
 import sys
 
 FALL, FLAP = 0, 1
@@ -29,11 +29,11 @@ class QLearner:
     def import_q_values(self, path):
         if os.path.isfile(path):
             with open(path) as infile:
-                return pickle.load(infile)
+                return json.loads(infile)
 
     def dump_q_values(self, path):
         with open(path, 'w') as outfile:
-            pickle.dump(self.q_values, outfile)
+            json.dumps(self.q_values, outfile)
 
     def get_current_epsilon(self):
         return max(1.0 / (self.episodes + 1.0), 0.01) if not self.epsilon else self.epsilon
