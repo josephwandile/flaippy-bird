@@ -37,7 +37,7 @@ class QLearner:
             outfile.write(dump)
 
     def get_current_epsilon(self):
-        return max(1.0 / (self.episodes + 1.0), 0.01) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        return max(0.05 / (self.episodes + 1.0), 0.01) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
 
     def off_policy(self):
         return random.random() < self.get_current_epsilon()
@@ -52,7 +52,7 @@ class QLearner:
         # Assumes terminal states have value == 0.0
         return max([self.get_q_value(state, action) for action in self.actions]) if state else -1000.0
 
-    def get_greedy_action(self, state):
+    def get_greedy_action(self, state): # TODO should probably tie break randomly
         return FALL if self.get_q_value(state, FALL) >= self.get_q_value(state, FLAP) else FLAP
 
     def get_action(self, state):
@@ -83,6 +83,18 @@ class QLearner:
 
         if not state:  # Previous state preceded a crash
             return -1000.0
+
+        rel_x, rel_y = state[0], state[1]
+
+        if rel_x <= 100:
+
+            if rel_x <= -20:
+                return 10.0  # Reward for scoring a point in the game
+
+            if abs(rel_y) <= 50:
+                return 5.0  # Reward for staying in line with gap
+
+            # return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
 
         return 1.0  # 1 point at every timestep if alive
 
