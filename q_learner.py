@@ -24,7 +24,7 @@ class QLearner:
         self.history = list()   # s, a pairs for t = 0 ... self.max_episodes
 
         self.dump_interval = 200
-        self.reporting_interval = 5
+        self.reporting_interval = 25
 
     def import_q_values(self, path):
         if os.path.isfile(path):
@@ -43,10 +43,10 @@ class QLearner:
         return random.random() < self.get_current_epsilon()
 
     def get_q_value(self, state, action):
-        return self.q_values[state, action]
+        return self.q_values[str((state, action))]
 
     def set_q_value(self, state, action, q_):
-        self.q_values[state, action] = q_
+        self.q_values[str((state, action))] = q_
 
     def get_value(self, state):
         # Assumes terminal states have value == -10
