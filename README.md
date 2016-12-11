@@ -8,7 +8,7 @@
 
 ## TODOs
 
-* Add command line args to define type of agent.
+* Make node_util.py not totally awful.
 * Experiment with other state representations and learning rates etc.
 * The Q learner has a tendency to flap upwards into the top of the screen. Not sure what causes this behavior, but it's super annoying. It appears to happen when the agent is in the top half of the pipe gap as it approaches.
 

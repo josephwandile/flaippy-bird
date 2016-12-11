@@ -49,8 +49,8 @@ class QLearner:
         self.q_values[str((state, action))] = q_
 
     def get_value(self, state):
-        # Assumes terminal states have value == -10
-        return max([self.get_q_value(state, action) for action in self.actions]) if state else -1000.0
+        # Assumes terminal states have value == 0.0
+        return max([self.get_q_value(state, action) for action in self.actions]) if state else 0.0
 
     def get_greedy_action(self, state):
         return FALL if self.get_q_value(state, FALL) >= self.get_q_value(state, FLAP) else FLAP
@@ -97,12 +97,12 @@ class QLearner:
         for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
             s, a = self.history[t]  # Current state
 
-            if not s_ and a == FLAP:  # Just flapped into a pipe or the ceiling, moron.
-                self.update(s, a, s_, -1000.0)  # Additional penalty for silly flap.
+            # if not s_ and a == FLAP:  # Just flapped into a pipe or the ceiling, moron.
+            #     self.update(s, a, s_, -1000.0)  # Additional penalty for silly flap.
 
             # Standard updates
             r = self.calculate_reward(s_)  # Reward is relative to the above s irrespective of lambda
-            n = min(t + 1, self.ld)
+            n = min(t, self.ld) + 1
             for t_ in range(t, t - n, -1):
                 s, a = self.history[t_]
                 self.update(s, a, s_, r)

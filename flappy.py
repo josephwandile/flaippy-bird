@@ -227,8 +227,8 @@ def main_game(movement_info, action_list=None, agent=None):
 
             if agent:
                 agent.learn_from_episode()
-                with open('scores.txt', 'a') as score_keeping:
-                    score_keeping.write('Episode: {}, Score: {}\n'.format(agent.episodes, score))
+                with open('scores.csv', 'a') as score_keeping:
+                    score_keeping.write('{},{}\n'.format(agent.episodes, score))
 
             return {
                 'y': player_y,
@@ -477,7 +477,7 @@ if __name__ == '__main__':
         if args['weights']:
             path = 'training.json'
 
-        main(agent=QLearner(ld=4, path=path))
+        main(agent=QLearner(path=path))
 
     else:
         main()
