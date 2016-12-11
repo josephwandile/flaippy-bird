@@ -477,7 +477,7 @@ if __name__ == '__main__':
         if args['weights']:
             path = 'training.json'
 
-        main(agent=QLearner(path=path, epsilon=0.0, ld=0))
+        main(agent=QLearner(path=path, epsilon=0.005, ld=0))
 
     else:
         main()

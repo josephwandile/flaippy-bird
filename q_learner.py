@@ -24,7 +24,7 @@ class QLearner:
         self.history = list()   # s, a pairs for t = 0 ... self.max_episodes
 
         self.dump_interval = 200
-        self.reporting_interval = 25
+        self.reporting_interval = 5
 
     def import_q_values(self, path):
         if os.path.isfile(path):
@@ -37,7 +37,7 @@ class QLearner:
             outfile.write(dump)
 
     def get_current_epsilon(self):
-        return max(1.0 / (self.episodes + 1.0), 0.01) if not self.epsilon else self.epsilon
+        return max(1.0 / (self.episodes + 1.0), 0.01) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
 
     def off_policy(self):
         return random.random() < self.get_current_epsilon()
