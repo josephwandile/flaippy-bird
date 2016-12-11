@@ -87,37 +87,19 @@ class QLearner:
         q_ = q + self.alpha * (reward + self.gamma * self.get_value(next_state) - q)
         self.set_q_value(state, action, q_)
 
-    def assign_credit(self, t, n):
-
-        s_ = self.history[t + 1][0] if t + 1 < len(self.history) else None
-
-        if not s_:  # Additionally punish previous q-state if flapped into oblivion
-            s, a = self.history[t]
-            if a == FLAP:
-                self.update(s, a, s_, -1000.0)
-
-        # Assign credit to current, and previous n - 1 q-states
-        r = self.calculate_reward(s_)
-        for t_ in range(t - 1, -1, -1):
-
-            s, a = self.history[t_]
-            self.update(s, a, s_, r)  # BUG!
-
     def learn_from_episode(self):
         num_actions = len(self.history)
         s_ = None
         for t in range(num_actions - 1, -1, -1):
-            s, a = self.history[t]
+            s, _ = self.history[t]
             r = self.calculate_reward(s_)
-            self.update(s, a, s_, r)
-            # TD Lambda using the same reward, but updating s_ to be the next state... TODO
+            n = min(t + 1, self.ld)
+            for t_ in range(t, t - n, -1):
+                s, a = self.history[t_]
+                self.update(s, a, s_, r)
+
+                s_ = s
             s_ = s
-
-
-
-        # for t in range(num_actions):
-        #     n = min(self.ld, t) + 1
-        #     self.assign_credit(t, n)
 
         # Clear episode's history
         self.history = list()
