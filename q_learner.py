@@ -11,7 +11,7 @@ class QLearner:
 
     def __init__(self, path=None, ld=0, epsilon=None):
 
-        self.q_values = self.import_q_values(path) if path else defaultdict(float)
+        self.q_values = defaultdict(float, self.import_q_values(path)) if path else defaultdict(float)
 
         self.epsilon = epsilon  # off-policy rate
         self.alpha = 0.7        # learning rate
@@ -37,7 +37,8 @@ class QLearner:
             outfile.write(dump)
 
     def get_current_epsilon(self):
-        return max(0.05 / (self.episodes + 1.0), 0.01) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        # return max(0.05 / (self.episodes + 1.0), 0.01) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        return max(0.05 / (self.episodes ** (1.005) + 1.0), 0.0005) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
 
     def off_policy(self):
         return random.random() < self.get_current_epsilon()
@@ -52,7 +53,7 @@ class QLearner:
         # Assumes terminal states have value == 0.0
         return max([self.get_q_value(state, action) for action in self.actions]) if state else -1000.0
 
-    def get_greedy_action(self, state): # TODO should probably tie break randomly
+    def get_greedy_action(self, state):
         return FALL if self.get_q_value(state, FALL) >= self.get_q_value(state, FLAP) else FLAP
 
     def get_action(self, state):
@@ -84,19 +85,7 @@ class QLearner:
         if not state:  # Previous state preceded a crash
             return -1000.0
 
-        rel_x, rel_y = state[0], state[1]
-
-        if rel_x <= 100:
-
-            if rel_x <= -20:
-                return 10.0  # Reward for scoring a point in the game
-
-            if abs(rel_y) <= 50:
-                return 5.0  # Reward for staying in line with gap
-
-            # return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
-
-        return 1.0  # 1 point at every timestep if alive
+        return 1.0
 
     def update(self, state, action, next_state, reward):
         q = self.get_q_value(state, action)
@@ -107,10 +96,7 @@ class QLearner:
         num_actions = len(self.history)
         s_ = None  # s_ is the next state in the update: s, a, s_, r
         for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
-            s, a = self.history[t]  # Current state
-
-            # if not s_ and a == FLAP:  # Just flapped into a pipe or the ceiling, moron.
-            #     self.update(s, a, s_, -1000.0)  # Additional penalty for silly flap.
+            s, _ = self.history[t]  # Current state
 
             # Standard updates
             r = self.calculate_reward(s_)  # Reward is relative to the above s irrespective of lambda

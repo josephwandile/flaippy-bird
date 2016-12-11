@@ -61,35 +61,34 @@ def main(action_list=None, agent=None):
     SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
     SOUNDS['wing'] = pygame.mixer.Sound('assets/audio/wing' + soundExt)
 
+    IMAGES['background'] = pygame.image.load('assets/sprites/background-day.png').convert()
+
+    IMAGES['player'] = (
+        pygame.image.load('assets/sprites/bluebird-upflap.png').convert_alpha(),
+        pygame.image.load('assets/sprites/bluebird-midflap.png').convert_alpha(),
+        pygame.image.load('assets/sprites/bluebird-downflap.png').convert_alpha(),
+    )
+
+    IMAGES['pipe'] = (
+        pygame.transform.rotate(
+            pygame.image.load('assets/sprites/pipe-green.png').convert_alpha(), 180),
+        pygame.image.load('assets/sprites/pipe-green.png').convert_alpha(),
+    )
+
+    # hismask for pipes
+    HITMASKS['pipe'] = (
+        get_hitmask(IMAGES['pipe'][0]),
+        get_hitmask(IMAGES['pipe'][1]),
+    )
+
+    # hitmask for player
+    HITMASKS['player'] = (
+        get_hitmask(IMAGES['player'][0]),
+        get_hitmask(IMAGES['player'][1]),
+        get_hitmask(IMAGES['player'][2]),
+    )
+
     while True:  # Game loop
-
-        IMAGES['background'] = pygame.image.load('assets/sprites/background-day.png').convert()
-
-        IMAGES['player'] = (
-            pygame.image.load('assets/sprites/bluebird-upflap.png').convert_alpha(),
-            pygame.image.load('assets/sprites/bluebird-midflap.png').convert_alpha(),
-            pygame.image.load('assets/sprites/bluebird-downflap.png').convert_alpha(),
-        )
-
-        IMAGES['pipe'] = (
-            pygame.transform.rotate(
-                pygame.image.load('assets/sprites/pipe-green.png').convert_alpha(), 180),
-            pygame.image.load('assets/sprites/pipe-green.png').convert_alpha(),
-        )
-
-        # hismask for pipes
-        HITMASKS['pipe'] = (
-            get_hitmask(IMAGES['pipe'][0]),
-            get_hitmask(IMAGES['pipe'][1]),
-        )
-
-        # hitmask for player
-        HITMASKS['player'] = (
-            get_hitmask(IMAGES['player'][0]),
-            get_hitmask(IMAGES['player'][1]),
-            get_hitmask(IMAGES['player'][2]),
-        )
-
         movement_info = show_welcome_animation(action_list=action_list, agent=agent)
         crash_info = main_game(movement_info, action_list=action_list, agent=agent)
         show_game_over_screen(crash_info, agent=agent)
@@ -477,7 +476,7 @@ if __name__ == '__main__':
         if args['weights']:
             path = 'training.json'
 
-        main(agent=QLearner(path=path, epsilon=0.0, ld=0))
+        main(agent=QLearner(path=None, epsilon=None, ld=1))
 
     else:
         main()
