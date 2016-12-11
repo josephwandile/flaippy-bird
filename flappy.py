@@ -13,7 +13,7 @@ from q_learner import QLearner
 import argparse
 
 PIPE_IND = 0
-FPS = 60
+FPS = 400
 SCREENWIDTH = 288
 SCREENHEIGHT = 512
 PIPE_GAP_SIZE = 100
@@ -477,7 +477,7 @@ if __name__ == '__main__':
         if args['weights']:
             path = 'training.json'
 
-        main(agent=QLearner(path=path))
+        main(agent=QLearner(path=path, epsilon=0.0, ld=0))
 
     else:
         main()

@@ -15,7 +15,7 @@ class QLearner:
 
         self.epsilon = epsilon  # off-policy rate
         self.alpha = 0.7        # learning rate
-        self.gamma = 0.8        # discount
+        self.gamma = 1.0        # discount
         self.ld = ld            # lambda
 
         self.actions = list([FALL, FLAP])
@@ -50,7 +50,7 @@ class QLearner:
 
     def get_value(self, state):
         # Assumes terminal states have value == 0.0
-        return max([self.get_q_value(state, action) for action in self.actions]) if state else 0.0
+        return max([self.get_q_value(state, action) for action in self.actions]) if state else -1000.0
 
     def get_greedy_action(self, state):
         return FALL if self.get_q_value(state, FALL) >= self.get_q_value(state, FLAP) else FLAP
