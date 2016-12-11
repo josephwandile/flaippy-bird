@@ -50,7 +50,7 @@ class QLearner:
 
     def get_value(self, state):
         # Assumes terminal states have value == -10
-        return max([self.get_q_value(state, action) for action in self.actions]) if state else -100.0
+        return max([self.get_q_value(state, action) for action in self.actions]) if state else -1000.0
 
     def get_greedy_action(self, state):
         return FALL if self.get_q_value(state, FALL) >= self.get_q_value(state, FLAP) else FLAP
@@ -61,26 +61,30 @@ class QLearner:
         return action
 
     def calculate_reward(self, state):
+
+        """
+        It's possible to make the reward function more advanced. e.g.
+
+        rel_x, rel_y = state[0], state[1]
+
+        if rel_x <= 200:
+
+            if rel_x <= -20:
+                return 10.0  # Reward for scoring a point in the game
+
+            if abs(rel_y) <= 50:
+                return 5.0  # Reward for staying in line with gap
+
+            return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
+
+        # Initial reward at beginning of game to avoid bird flying into ceiling constantly.
+        return 0.0
+        """
+
         if not state:  # Previous state preceded a crash
             return -1000.0
-        """
-        The bird shouldn't be rewarded for simply staying alive. This associates small positive scores with pointless flaps and falls
-        across many states making it harder to learn an effective policy when encountering new states.
 
-        TODO Consider limiting the number of flaps in a given period using some sort of get_legal_actions() function.
-        """
-        return 1.0
-        # rel_x, rel_y = state[0], state[1]
-        #
-        # if rel_x <= 200:
-        #
-        #     if abs(rel_y) <= 20:  # Reward for staying in line with gap
-        #         return 5.0
-        #
-        #     return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
-        #
-        # # Initial reward at beginning of game to avoid bird flying into ceiling constantly.
-        # return 0.0
+        return 1.0  # 1 point at every timestep if alive
 
     def update(self, state, action, next_state, reward):
         q = self.get_q_value(state, action)
@@ -89,17 +93,22 @@ class QLearner:
 
     def learn_from_episode(self):
         num_actions = len(self.history)
-        s_ = None
-        for t in range(num_actions - 1, -1, -1):
-            s, _ = self.history[t]
-            r = self.calculate_reward(s_)
+        s_ = None  # s_ is the next state in the update: s, a, s_, r
+        for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
+            s, a = self.history[t]  # Current state
+
+            if not s_ and a == FLAP:  # Just flapped into a pipe or the ceiling, moron.
+                self.update(s, a, s_, -1000.0)  # Additional penalty for silly flap.
+
+            # Standard updates
+            r = self.calculate_reward(s_)  # Reward is relative to the above s irrespective of lambda
             n = min(t + 1, self.ld)
             for t_ in range(t, t - n, -1):
                 s, a = self.history[t_]
                 self.update(s, a, s_, r)
+                s_ = s  # TD-l keeps the reward calculated in the outer for-loop, but s_ must still be updated
 
-                s_ = s
-            s_ = s
+            s_ = s  # After propagating reward to self.ld - 1 other states, revert to the actual next state
 
         # Clear episode's history
         self.history = list()
