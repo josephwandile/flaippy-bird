@@ -62,24 +62,25 @@ class QLearner:
 
     def calculate_reward(self, state):
         if not state:  # Previous state preceded a crash
-            return -100.0
+            return -1000.0
         """
         The bird shouldn't be rewarded for simply staying alive. This associates small positive scores with pointless flaps and falls
         across many states making it harder to learn an effective policy when encountering new states.
 
         TODO Consider limiting the number of flaps in a given period using some sort of get_legal_actions() function.
         """
-        rel_x, rel_y = state[0], state[1]
-
-        if rel_x <= 200:
-
-            if abs(rel_y) <= 20:  # Reward for staying in line with gap
-                return 5.0
-
-            return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
-
-        # Initial reward at beginning of game to avoid bird flying into ceiling constantly.
-        return 0.0
+        return 1.0
+        # rel_x, rel_y = state[0], state[1]
+        #
+        # if rel_x <= 200:
+        #
+        #     if abs(rel_y) <= 20:  # Reward for staying in line with gap
+        #         return 5.0
+        #
+        #     return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
+        #
+        # # Initial reward at beginning of game to avoid bird flying into ceiling constantly.
+        # return 0.0
 
     def update(self, state, action, next_state, reward):
         q = self.get_q_value(state, action)
@@ -97,15 +98,26 @@ class QLearner:
 
         # Assign credit to current, and previous n - 1 q-states
         r = self.calculate_reward(s_)
-        for t_ in range(t, t - n, -1):
+        for t_ in range(t - 1, -1, -1):
+
             s, a = self.history[t_]
             self.update(s, a, s_, r)  # BUG!
 
     def learn_from_episode(self):
         num_actions = len(self.history)
-        for t in range(num_actions):
-            n = min(self.ld, t) + 1
-            self.assign_credit(t, n)
+        s_ = None
+        for t in range(num_actions - 1, -1, -1):
+            s, a = self.history[t]
+            r = self.calculate_reward(s_)
+            self.update(s, a, s_, r)
+            # TD Lambda using the same reward, but updating s_ to be the next state... TODO
+            s_ = s
+
+
+
+        # for t in range(num_actions):
+        #     n = min(self.ld, t) + 1
+        #     self.assign_credit(t, n)
 
         # Clear episode's history
         self.history = list()
