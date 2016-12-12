@@ -458,6 +458,9 @@ if __name__ == '__main__':
     args = vars(parser.parse_args())
 
     if args['search']:
+        if args['size'] > 450:
+            print "please choose a number under 450; deterministic pipes are only defined up to 450."
+            sys.exit()
         action_list = None
         node_util.initialize()
         if args['weights']:

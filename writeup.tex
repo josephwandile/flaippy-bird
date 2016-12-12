@@ -157,18 +157,34 @@ The empirical results for the heuristic will be discussed in the results section
 The encoding of states into graph search nodes can be found in \texttt{node\_util.py},
 while the A* implementation can be found in \texttt{algs.py}. Both implementations
 were written independently and internally, without consultation of outside sources
-for either. We recommend that the reader inspect these files, as they are commented
+for either. We respectfully recommend that the reader inspect these files, as they are commented
 extensively and should be considered part of our report.
 
 
 
-\section{Experiments}
-Analysis, evaluation, and critique of the algorithm and your
-implementation. Include a description of the testing data you used and
-a discussion of examples that illustrate major features of your
-system. Testing is a critical part of system construction, and the
-scope of your testing will be an important component in our
-evaluation. Discuss what you learned from the implementation.
+\section{Experiments and Results}
+% Analysis, evaluation, and critique of the algorithm and your
+% implementation. Include a description of the testing data you used and
+% a discussion of examples that illustrate major features of your
+% system. Testing is a critical part of system construction, and the
+% scope of your testing will be an important component in our
+% evaluation. Discuss what you learned from the implementation.
+We present our experimentation and results jointly, as our project is more accurately
+described as experimental than as comparative.
+
+\subsection{Informed Search}
+It might seem prudent to first provide a comparison of two search processes,
+with one using the defined heuristic and the other using a naive heuristic. We'll
+spoil the surprise by reporting that a search process using a naive heuristic won't
+find a solution even to the one pipe problem, even after expending hundreds of thousands
+of nodes. On the other hand, the heuristic as defined successfully solves arbitrarily-
+sized problems with ease and efficiency. Our experimentation and results are grouped
+neatly into the categories of speed and of expansion efficiency.
+
+\subsubsection{Speed Performance}
+We were impressed by the
+
+
 
 \begin{table}
   \centering
@@ -182,11 +198,6 @@ evaluation. Discuss what you learned from the implementation.
   \end{tabular}
   \caption{Description of the results.}
 \end{table}
-
-
-\subsection{Results}
-
- For algorithm-comparison projects: a section reporting empirical comparison results preferably presented graphically.
 
 
 \section{Discussion}
