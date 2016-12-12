@@ -226,7 +226,7 @@ def main_game(movement_info, action_list=None, agent=None):
 
             if agent:
                 agent.learn_from_episode()
-                with open('performance/scores.csv', 'a') as score_keeping:
+                with open('performance/ties.csv', 'a') as score_keeping:
                     score_keeping.write('{},{}\n'.format(agent.episodes, score))
 
             return {
@@ -476,7 +476,7 @@ if __name__ == '__main__':
         if args['weights']:
             path = 'training/demo.json'
 
-        main(agent=QLearner(import_from=path, epsilon=None, ld=1, training=False))
+        main(agent=QLearner(import_from=path, export_to='training/ties.json', epsilon=None, ld=1, training=True))
 
     else:
         main()

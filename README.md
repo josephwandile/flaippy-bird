@@ -2,7 +2,7 @@
 
 ## Getting started
 * Make sure you've got PyGame 1.9+ installed and are running Python 2.7+. You may also need to update your PC's package of libpng.
-* For a demo of the TD-lambda learner, run ```main(agent=QLearner(import_from='training/demo.json', epsilon=None, ld=1, training=False))``` at the bottom of `flappy.py`.
+* For a demo of the TD-lambda learner, run `main(agent=QLearner(import_from='training/demo.json', epsilon=None, ld=1, training=False))` at the bottom of `flappy.py`.
 
 ## RL Statespace
 * 10 by 10 grid of 10 by 10 units immediately in front of the next gap. 
@@ -12,6 +12,7 @@
 
 ## TODOs
 * Clean up command line args and general IO.
+* `pipes.py` shouldn't exist.
 * Make node_util.py not totally awful.
 * Consolidate and clean up code. A lot is split between multiple files. 
 * Those global variables and constants though... 

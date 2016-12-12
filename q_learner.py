@@ -36,7 +36,7 @@ class QLearner:
         if self.import_from:
             if os.path.isfile(self.import_from):
                 with open(self.import_from) as infile:
-                    self.q_values = json.load(infile)
+                    self.q_values = defaultdict(float, json.load(infile))
 
     def _dump_q_values(self):
         with open(self.export_to, 'w') as outfile:
@@ -73,7 +73,21 @@ class QLearner:
         return max([self._get_q_value(state, action) for action in self.actions]) if state else self.penalty
 
     def _get_greedy_action(self, state):
-        return FALL if self._get_q_value(state, FALL) >= self._get_q_value(state, FLAP) else FLAP
+        # return FALL if self._get_q_value(state, FALL) >= self._get_q_value(state, FLAP) else FLAP
+        fall_value = self._get_q_value(state, FALL)
+        flap_value = self._get_q_value(state, FLAP)
+        if fall_value > flap_value:
+            return FALL
+        elif flap_value > fall_value:
+            return FLAP
+        else:  # Heuristic-based tie-breaking...
+            rel_x, rel_y, vel_y = state
+            if rel_y > -10 and vel_y < 0: # Above midpoint and rising
+                return FALL
+            elif rel_y < -10 and vel_y > 0: # Below midpoint and falling
+                return FLAP
+            else:
+                return FALL
 
     def _get_action(self, state):
         action = random.choice(self.actions) if self._off_policy() else self._get_greedy_action(state)
@@ -100,11 +114,22 @@ class QLearner:
         return 0.0
         """
 
-        if not state:  # Previous state preceded a crash
+        # if not state:
+        #     return -1.0
+        #
+        # rel_x, rel_y = state[0], state[1]
+        # if rel_x < -10 and abs(rel_y) <= 50:
+        #     return 10.0  # Reward for scoring a point in the game
+
+        if not state:
             return self.penalty
 
         return self.reward
 
+        # if not state:  # Previous state preceded a crash
+        #     return self.penalty
+        #
+        # return self.reward
 
     def _update(self, state, action, next_state, reward):
         if not self.training:
@@ -146,7 +171,14 @@ class QLearner:
         num_actions = len(self.history)
         s_ = None  # s_ is the next state in the _update: s, a, s_, r
         for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
-            s, _ = self.history[t]  # Current state
+            s, a = self.history[t]  # Current state
+
+            # Additionally penalize FLAPs which pushed the bird upwards instead of towards the gap
+            # np = 0
+            # rel_x, rel_y = s[0], s[1]
+            # if -10 <= rel_x <= 50 and rel_y > 30 and a == FLAP and np != 10:
+            #     self._update(s, a, s_, self.penalty)
+            #     np += 1
 
             # Standard updates
             r = self._calculate_reward(s_)  # Reward is relative to the above s irrespective of lambda
