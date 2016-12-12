@@ -454,7 +454,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--search', help='Solve with A*, then watch.', action='store_true')
     parser.add_argument('-l', '--learn', help='Solve with TD-lambda, then watch.', action='store_true')
     parser.add_argument('-w', '--weights', help='Upload previous solution', action='store_true')
-    parser.add_argument('size', type=int, nargs='?', help='size of the search problem to solve')
+    parser.add_argument('size', type=int, nargs='?', help='size of the search problem to solve. Ignored if agent is in RL mode.')
     args = vars(parser.parse_args())
     print args
 
