@@ -9,62 +9,81 @@ FALL, FLAP = 0, 1
 
 class QLearner:
 
-    def __init__(self, path=None, ld=0, epsilon=None):
-
-        self.q_values = defaultdict(float, self.import_q_values(path)) if path else defaultdict(float)
+    def __init__(self, import_from=None, export_to=None, ld=0, epsilon=None, penalty=-1000.0, reward=1.0, training=True):
 
         self.epsilon = epsilon  # off-policy rate
         self.alpha = 0.7        # learning rate
         self.gamma = 1.0        # discount
         self.ld = ld            # lambda
+        self.penalty = penalty
+        self.reward = reward
 
         self.actions = list([FALL, FLAP])
         self.episodes = 0
         self.max_episodes = 3000
         self.history = list()   # s, a pairs for t = 0 ... self.max_episodes
+        self.training = training
 
+        self.import_from = import_from
+        self.export_to = export_to
         self.dump_interval = 200
         self.reporting_interval = 5
 
-    def import_q_values(self, path):
-        if os.path.isfile(path):
-            with open(path) as infile:
-                return json.load(infile)
+        self.q_values = defaultdict(float)
+        self._init_q_values()
 
-    def dump_q_values(self, path="training.json"):
-        with open(path, 'w') as outfile:
+    def _init_q_values(self):
+        if self.import_from:
+            if os.path.isfile(self.import_from):
+                with open(self.import_from) as infile:
+                    self.q_values = json.load(infile)
+
+    def _dump_q_values(self):
+        with open(self.export_to, 'w') as outfile:
             dump = json.dumps(self.q_values, sort_keys=True, indent=2, separators=(',', ': '))
             outfile.write(dump)
 
-    def get_current_epsilon(self):
-        # return max(0.05 / (self.episodes + 1.0), 0.01) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
-        return max(0.05 / (self.episodes ** (1.005) + 1.0), 0.0005) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+    def _get_current_epsilon(self):
 
-    def off_policy(self):
-        return random.random() < self.get_current_epsilon()
+        """
+        Possible functions for epsilon.
 
-    def get_q_value(self, state, action):
+        Examples include:
+
+            0.25 / (self.episodes / 100 + 1)
+            max(0.01, 1.0 / (self.episodes + 1)
+            math.exp(Q(s, FALL) / T) / ((math.exp(Q(s, FALL) / T) + math.exp(Q(s, FLAP) / T))
+                where T = 10.0/(self.episodes / 25 + 1)
+
+            and so on...
+
+        """
+        return 0.0 if not self.epsilon else self.epsilon
+
+    def _off_policy(self):
+        return random.random() < self._get_current_epsilon()
+
+    def _get_q_value(self, state, action):
         return self.q_values[str((state, action))]
 
-    def set_q_value(self, state, action, q_):
+    def _set_q_value(self, state, action, q_):
         self.q_values[str((state, action))] = q_
 
-    def get_value(self, state):
-        # Assumes terminal states have value == 0.0
-        return max([self.get_q_value(state, action) for action in self.actions]) if state else -1000.0
+    def _get_value(self, state):
+        return max([self._get_q_value(state, action) for action in self.actions]) if state else self.penalty
 
-    def get_greedy_action(self, state):
-        return FALL if self.get_q_value(state, FALL) >= self.get_q_value(state, FLAP) else FLAP
+    def _get_greedy_action(self, state):
+        return FALL if self._get_q_value(state, FALL) >= self._get_q_value(state, FLAP) else FLAP
 
-    def get_action(self, state):
-        action = random.choice(self.actions) if self.off_policy() else self.get_greedy_action(state)
+    def _get_action(self, state):
+        action = random.choice(self.actions) if self._off_policy() else self._get_greedy_action(state)
         self.history.append((state, action))
         return action
 
-    def calculate_reward(self, state):
+    def _calculate_reward(self, state):
 
         """
-        It's possible to make the reward function more advanced. e.g.
+        It's possible to make the reward function more advanced. For example:
 
         rel_x, rel_y = state[0], state[1]
 
@@ -78,32 +97,63 @@ class QLearner:
 
             return 1.0  # Standard reward for staying alive, given that we've past the first pipe.
 
-        # Initial reward at beginning of game to avoid bird flying into ceiling constantly.
         return 0.0
         """
 
         if not state:  # Previous state preceded a crash
-            return -1000.0
+            return self.penalty
 
-        return 1.0
+        return self.reward
 
-    def update(self, state, action, next_state, reward):
-        q = self.get_q_value(state, action)
-        q_ = q + self.alpha * (reward + self.gamma * self.get_value(next_state) - q)
-        self.set_q_value(state, action, q_)
+
+    def _update(self, state, action, next_state, reward):
+        if not self.training:
+            return
+
+        q = self._get_q_value(state, action)
+        q_ = q + self.alpha * (reward + self.gamma * self._get_value(next_state) - q)
+        self._set_q_value(state, action, q_)
+
+    def _extract_state(self, x_offset, y_offset, y_vel):
+        """
+        :param x_offset: relative horizontal distance from bird's RHS to LHS of lower pipe
+        :param y_offset: relative vertical distance from bird's midpoint to gap midpoint
+        :param y_vel: vertical velocity
+
+        Note: Bird has height == 24, width == 34
+
+        It's possible to make the state space even smaller by breaking up y_vel:
+
+            if y_vel > 5:
+                y_vel = 1
+            elif y_vel > 0:
+                y_vel = 2
+            elif y_vel > -5:
+                y_vel = 3
+            elif y_vel > -11:
+                y_vel = 4
+        """
+        x_offset -= x_offset % 10 if x_offset <= 100 else x_offset % 100
+        y_offset -= y_offset % 10 if abs(y_offset) <= 100 else y_offset % 100  # i.e. from -100 to 100
+        return x_offset, y_offset, y_vel
+
+    def take_action(self, game_state):
+        state = self._extract_state(*game_state)
+        action = self._get_action(state)
+        return action
 
     def learn_from_episode(self):
         num_actions = len(self.history)
-        s_ = None  # s_ is the next state in the update: s, a, s_, r
+        s_ = None  # s_ is the next state in the _update: s, a, s_, r
         for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
             s, _ = self.history[t]  # Current state
 
             # Standard updates
-            r = self.calculate_reward(s_)  # Reward is relative to the above s irrespective of lambda
+            r = self._calculate_reward(s_)  # Reward is relative to the above s irrespective of lambda
             n = min(t, self.ld) + 1
             for t_ in range(t, t - n, -1):
                 s, a = self.history[t_]
-                self.update(s, a, s_, r)
+                self._update(s, a, s_, r)
                 s_ = s  # TD-l keeps the reward calculated in the outer for-loop, but s_ must still be updated
 
             s_ = s  # After propagating reward to self.ld - 1 other states, revert to the actual next state
@@ -115,28 +165,12 @@ class QLearner:
         if self.episodes % self.reporting_interval == 0:
             print(
                   "{} episodes complete; {} states instantiated, {} exploration factor"
-                  .format(self.episodes, len(self.q_values), self.get_current_epsilon())
+                  .format(self.episodes, len(self.q_values), self._get_current_epsilon())
                  )
 
         if self.episodes % self.dump_interval == 0:
-            self.dump_q_values()
+            self._dump_q_values()
 
         if self.episodes == self.max_episodes + 1:
             sys.exit()
 
-    def extract_state(self, x_offset, y_offset, y_vel):
-        """
-        Note: Bird has height == 24, width == 34
-
-        :param x_offset: relative horizontal distance from bird's RHS to LHS of lower pipe
-        :param y_offset: relative vertical distance from bird's midpoint to gap midpoint
-        :param y_vel: vertical velocity
-        """
-        x_offset -= x_offset % 10 if x_offset <= 100 else x_offset % 100
-        y_offset -= y_offset % 10 if abs(y_offset) <= 100 else y_offset % 100  # i.e. from -100 to 100
-        return x_offset, y_offset, y_vel
-
-    def take_action(self, game_state):
-        state = self.extract_state(*game_state)
-        action = self.get_action(state)
-        return action

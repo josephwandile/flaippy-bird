@@ -221,12 +221,12 @@ def main_game(movement_info, action_list=None, agent=None):
         crashTest = check_crash({'x': player_x, 'y': player_y, 'index': player_index},
                                 upper_pipes, lower_pipes)
 
-        # TODO crash test should take into account that the bird can't fly off the screen
+        # TODO crash test should take into account that the bird can't fly off the screen... Logic needn't be out here.
         if crashTest[0] or player_y <= 0:
 
             if agent:
                 agent.learn_from_episode()
-                with open('scores.csv', 'a') as score_keeping:
+                with open('performance/scores.csv', 'a') as score_keeping:
                     score_keeping.write('{},{}\n'.format(agent.episodes, score))
 
             return {
@@ -474,9 +474,9 @@ if __name__ == '__main__':
     elif args['learn']:
         path = None
         if args['weights']:
-            path = 'training.json'
+            path = 'training/demo.json'
 
-        main(agent=QLearner(path=None, epsilon=None, ld=1))
+        main(agent=QLearner(import_from=path, epsilon=None, ld=1, training=False))
 
     else:
         main()

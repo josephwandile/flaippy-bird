@@ -1,20 +1,18 @@
 # Flaippy Bird
 
+## Getting started
+* Make sure you've got PyGame 1.9+ installed and are running Python 2.7+. You may also need to update your PC's package of libpng.
+* For a demo of the TD-lambda learner, run ```main(agent=QLearner(import_from='training/demo.json', epsilon=None, ld=1, training=False))``` at the bottom of `flappy.py`.
+
 ## RL Statespace
 * 10 by 10 grid of 10 by 10 units immediately in front of the next gap. 
 * More than 50 above or below the gap, the y-discretization increases to 100. 
 * 100 horizontal units before the next gap the x-discretization increases to 100.
-
+* Vertical velocity `[-10, -9, ... , 9, 10]`.
 
 ## TODOs
-
+* Clean up command line args and general IO.
 * Make node_util.py not totally awful.
-* Experiment with other state representations and learning rates etc.
-* The Q learner has a tendency to flap upwards into the top of the screen. Not sure what causes this behavior, but it's super annoying. It appears to happen when the agent is in the top half of the pipe gap as it approaches.
-
-#### You can very the behavior of the Q-learner by 
-* Changing the values of epsilon, gamma, alpha. 
-* Changing ld = lambda. This is the number of previous s, a pairs which get assigned credit uniformly for each reward. 
-* Changing the size of the state space. You can make this bigger by making the discretization units for x, y and velocity smaller. 
-* Altering the size of the rewards given to the agent for staying between the two pipes at all times. 
-* Changing the rate at which epsilon cools.
+* Consolidate and clean up code. A lot is split between multiple files. 
+* Those global variables and constants though... 
+* The Q Learner commits suicide when prospects look grim. Work on getting it to be risky and aim for the gap even when failure is certain.
