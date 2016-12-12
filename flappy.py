@@ -463,11 +463,11 @@ if __name__ == '__main__':
             if os.path.isfile('path.json'):
                 infile = open('path.json')
                 action_list = json.load(infile)
-            else:
-                action_list = algs.search(structs.PriorityQueue, 450, lambda successor: algs.heuristic(successor))[0]
-                outfile = open('path.json', 'w')
-                dump = json.dumps(action_list, sort_keys=True, indent=2, separators=(',', ': '))
-                outfile.write(dump)
+        else:
+            action_list = algs.search(structs.PriorityQueue, 450, lambda successor: algs.heuristic(successor))[0]
+            outfile = open('path.json', 'w')
+            dump = json.dumps(action_list, sort_keys=True, indent=2, separators=(',', ': '))
+            outfile.write(dump)
 
         main(action_list=action_list)
 
