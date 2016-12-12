@@ -1,5 +1,8 @@
-.txt
+*.csv
+*.txt
 *.pyc
 *.json
+!demo.json
 __pycache__
 .idea
+.DS_Store

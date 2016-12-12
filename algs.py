@@ -28,7 +28,7 @@ def search(structure, num_pipes, cost_function=None):
 
     for successor in node_util.getSuccessors(start.state):
         fringe.push((successor.state, [successor.flapped]), successor.cost, cost_function(successor))
-        visited[successor.state] = successor.cost  # update best cost to successors
+        visited[successor.state] = successor.cost  # _update best cost to successors
     called = 0
     while not fringe.isEmpty():
         called += 1
