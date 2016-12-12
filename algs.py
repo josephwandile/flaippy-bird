@@ -1,12 +1,13 @@
 import node_util
 
-"""allows for a very (very) pretty abstraction, wherein the implementation
-of graph search doesn't change, the user just decides which fringe type to
-use. Stack will run DFS, Queue will run BFS, priority queues will run either UCS
-or A*, depending on the cost function. Yay!"""
+
 
 
 class Fringe:
+    """Allows for a very (very) pretty abstraction, wherein the implementation
+    of graph search doesn't change, the user just decides which fringe type to
+    use. Stack will run DFS, Queue will run BFS, priority queues will run either UCS
+    or A*, depending on the cost function."""
 
     def __init__(self, s):
         self.structure = s()
@@ -22,12 +23,12 @@ class Fringe:
     def isEmpty(self):
         return self.structure.isEmpty()
 
-"""fringe-agnostic graph search problem. Inputs are the type of fringe, number of
-pipes to solve, and cost function for a node (constant for UCS,
-heuristic for A*)"""
-
 
 def search(structure, num_pipes, cost_function=None):
+    """fringe-agnostic graph search problem. Inputs are the type of fringe, number of
+    pipes to solve, and cost function for a node (constant for UCS,
+    heuristic for A*)"""
+
     if cost_function is None:
         def cost_function():
             return 0
@@ -50,13 +51,16 @@ def search(structure, num_pipes, cost_function=None):
             return cur[1], called
         else:
             for successor in node_util.getSuccessors(cur[0]):
+                # process neighbors
                 if successor.state in visited and visited[successor.state] > (visited[cur[0]] + successor.cost):
+                    # better path to visitor than found before, update and push to fringe
                     curpath = cur[1]
                     newpath = curpath + [successor.flapped]
                     fringe.push((successor.state, newpath), visited[
                         cur[0]], cost_function(successor))
                     visited[successor.state] = visited[cur[0]] + successor.cost
                 elif successor.state not in visited:
+                    # never seen it before, initialize node and push onto fringe
                     curpath = cur[1]
                     newpath = curpath + [successor.flapped]
                     visited[successor.state] = visited[cur[0]] + successor.cost
@@ -65,10 +69,15 @@ def search(structure, num_pipes, cost_function=None):
 
 
 def heuristic(state):
+    """Returns the MD from the state to the midpoint of the next pipe. Provably
+    admissible for the purposes of A*."""
     state = state.state
     playerMidPos = state.x + node_util.IMAGES['player'][0].get_width() / 2
     for upipe, lpipe in zip(state.upipes, state.lpipes):
+        # for loop functions to isolate the first pipe ahead of the agent and
+        # exclude those pipes that are behind the agent
         pipeMidPos = upipe['x'] + node_util.IMAGES['pipe'][0].get_width() / 2
         if pipeMidPos > playerMidPos:
+
             y_coord = lpipe['y'] - node_util.PIPE_GAP_SIZE + 37
             return abs(state.y - y_coord) + abs(state.x - pipeMidPos) - (state.score * 1000)

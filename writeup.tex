@@ -135,7 +135,7 @@ final heuristic function, then prove its admissibility and consistency. Define $
 to be the Manhattan distance between the current state's location and the \emph{midpoint}
 of the next pipe that the agent will encounter. This is the coordinate at the x-
 and y-averages of the pipe's left and right corners, and upper and lower pipes,
-respectively. Then let our heuristic $h(s) = m(s)$. We will now show certain
+respectively. Then let our heuristic $h(s) = m(s) - 1000s_c$. We will now show certain
 properties of this heuristic. But first, note an important property of this game's
 system: the x-velocity of the agent is constant, which means that every successive
 node represents a movement of constant distance in the direction of the goal.
@@ -145,18 +145,20 @@ direction, divided by the velocity in the x direction). \\\\
 Admissibility is trivial to show, since the heuristic gives the Manhattan distance to
 the next pipe. Because the distance between pipes is greater than the vertical range
 of pipe midpoints, $m(s)$ is necessarily less than or equal to the true distance to the
-goal. Showing consistency is a simple matter of noting that every successor to a node
-will be exactly the same amount closer to the next pipe midpoint as it is closer
-to the goal. This is again because of constant x velocity. Since the heuristic
-is admissible and consistent, we showed that A* is complete and optimal in this case.
+goal. Adding on the large negative constant relative to the score of the node, there is no way
+for the algorithm to overestimate the true goal cost.
+Interestingly, we do not require consistency, even though this is a graph search
+rather than a tree search. The reason for this is that we guarantee that every
+correct solution has equivalent cost, implying that optimality is trivially shown
+given a correct solution.\\
 The empirical results for the heuristic will be discussed in the results section.
 
 \subsection{Implementation Notes}
-The encoding of states into graph search nodes can be found in \texttt{node_util.py},
+The encoding of states into graph search nodes can be found in \texttt{node\_util.py},
 while the A* implementation can be found in \texttt{algs.py}. Both implementations
 were written independently and internally, without consultation of outside sources
-for either. We recommend that the reader open these files, as they are commented
-extensively and should be considered part of our explanation.
+for either. We recommend that the reader inspect these files, as they are commented
+extensively and should be considered part of our report.
 
 
 
