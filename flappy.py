@@ -454,7 +454,9 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--search', help='Solve with A*, then watch.', action='store_true')
     parser.add_argument('-l', '--learn', help='Solve with TD-lambda, then watch.', action='store_true')
     parser.add_argument('-w', '--weights', help='Upload previous solution', action='store_true')
+    parser.add_argument('size', metavar='N', type=int,help='size of the search problem to solve')
     args = vars(parser.parse_args())
+    print args
 
     if args['search']:
         action_list = None
@@ -464,7 +466,8 @@ if __name__ == '__main__':
                 infile = open('path.json')
                 action_list = json.load(infile)
         else:
-            action_list = algs.search(structs.PriorityQueue, 450, lambda successor: algs.heuristic(successor))[0]
+            print sys.argv
+            action_list = algs.search(structs.PriorityQueue, args['size'], lambda successor: algs.heuristic(successor))[0]
             outfile = open('path.json', 'w')
             dump = json.dumps(action_list, sort_keys=True, indent=2, separators=(',', ': '))
             outfile.write(dump)

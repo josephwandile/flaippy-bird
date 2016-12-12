@@ -20,7 +20,7 @@ This project was a technical study of the game ``Flappy Bird'' (FB) through the 
 of artificial intelligence. Using both deterministic and randomized paths,
 we represented FB as both an informed search problem and a Q-Learning process.
 Adopting the obvious end of maximizing the game's score as our agent's learning goal,
-we approached this problem in three phases. First, we adapted an open source version
+we approached this problem in three phases. First, we adapted an open source version (XXX LINK TO GITHUB PAGE)
 of this project into an interface conducive to AI work, redefining the game to be
 comprised of familiar objects like states, goals, rewards, successors, and the other
 necessary underlying factors. Second, we devised an informed search solution to the problem.
@@ -84,38 +84,79 @@ The functions, each operating on a node $s$, with attributes subscripted as abov
 \begin{enumerate}
     \item $G(s) = \mathbb{1}(s_c = C)$, a goal test that returns true if and only if
     a node's score is equal to the goal score $C$.
-    \item $A(s)$, a function returning the actions available to the agent at a state
+    \item $A(s)$, a function returning the actions available to the agent at
+        a state. These    will always be a member of $\emph{P} (\mathbb{A})$,
+        where $\mathbb{A} = \{\text{FLAP}, \text{FALL}\}$, and $\emph{P}$ denotes
+        the power set operator.
     \item $N(s)$, a function that returns a set of neighbors of the node, along
     with the action required to get to each.
     \item $D(s)$, a function returning true if and only if the state represents the
     ``game over'' state (after a crash).
 \end{enumerate}
-The constants $C$, the ``goal number'' of nodes that codes the complexity of the
+And the constants $C$, the ``goal number'' of nodes that codes the complexity of the
 game, and various more mundane constants that denote the number of pixels on the screen
 and such. It should be noted that for cleanliness, we abstracted these away into the
 functions $G, D, A, N$ so that the agent doesn't ever need to interact with them.
 
-
-
-
-
 \section{Approach}
 
-A clear specification of the algorithm(s) you used and a description
-of the main data structures in the implementation. Include a
-discussion of any details of the algorithm that were not in the
-published paper(s) that formed the basis of your implementation. A
-reader should be able to reconstruct and verify your work from reading
-your paper.
+% A clear specification of the algorithm(s) you used and a description
+% of the main data structures in the implementation. Include a
+% discussion of any details of the algorithm that were not in the
+% published paper(s) that formed the basis of your implementation. A
+% reader should be able to reconstruct and verify your work from reading
+% your paper.
 
-\begin{algorithm}
-  \begin{algorithmic}
-    \Procedure{MyAlgorithm}{$b$}
-    \State{$a \gets 10$}
-    \EndProcedure{}
-  \end{algorithmic}
-  \caption{Here is the algorithm.}
-\end{algorithm}
+\subsection{Informed Search}
+We used the well-known A* algorithm for the informed search part of our problem.
+Generating a large number of deterministic pipes for the agent to test on, we
+encoded world information into state-nodes, as specified above. We then defined
+the functions as specified above to allow to agent to ``move'' between states
+through time. This was an interesting procedure, as the agent does not directly
+control its fate, as Pac-Man did. Rather, it has control over the second- and
+third- order physical attributes of its state: its velocity and acceleration.
+In this way, the agent's path to the goal is not so much a sequence of choices of
+of physical locations, but rather a sequence of mechanical vectors through space
+and time. Rather than rewriting the A* algorithm here, the foregoing formal
+specification defined the key parts of the algorithm in terms of the FB game.
+For example, the canonical Get-Neighbors function is implemented as $N$, which
+returns the next state nodes, operating on the current one using the physical
+transitions that we encoded in addition to taking into account the range of actions
+that the agent has available. It is here that we were able to merge the algorithm
+with the physicality of the game to find an efficient solution.
+\subsubsection{Heuristic}
+The crux of the informed search section of this problem was in the choice of heuristic.
+As specified by the A* algorithm, the priority of a node in the frontier is given
+by the function $f = g + h$, where $g$ is the foregoing cost to get to the node and
+$h$ is the value of the heuristic function that estimates the future cost to the goal.
+We experimented extensively with heuristic functions, finding that there is high variance
+in the results as a function of the quality of the heuristic. We will present our
+final heuristic function, then prove its admissibility and consistency. Define $m(s)$
+to be the Manhattan distance between the current state's location and the \emph{midpoint}
+of the next pipe that the agent will encounter. This is the coordinate at the x-
+and y-averages of the pipe's left and right corners, and upper and lower pipes,
+respectively. Then let our heuristic $h(s) = m(s)$. We will now show certain
+properties of this heuristic. But first, note an important property of this game's
+system: the x-velocity of the agent is constant, which means that every successive
+node represents a movement of constant distance in the direction of the goal.
+The implication is that every correct solution to a problem will have exactly
+the same cost (specifically, the number of pixels traveled to the goal in the x
+direction, divided by the velocity in the x direction). \\\\
+Admissibility is trivial to show, since the heuristic gives the Manhattan distance to
+the next pipe. Because the distance between pipes is greater than the vertical range
+of pipe midpoints, $m(s)$ is necessarily less than or equal to the true distance to the
+goal. Showing consistency is a simple matter of noting that every successor to a node
+will be exactly the same amount closer to the next pipe midpoint as it is closer
+to the goal. This is again because of constant x velocity. Since the heuristic
+is admissible and consistent, we showed that A* is complete and optimal in this case.
+The empirical results for the heuristic will be discussed in the results section.
+
+\subsection{Implementation Notes}
+The encoding of states into graph search nodes can be found in \texttt{node_util.py},
+while the A* implementation can be found in \texttt{algs.py}. Both implementations
+were written independently and internally, without consultation of outside sources
+for either. We recommend that the reader open these files, as they are commented
+extensively and should be considered part of our explanation.
 
 
 

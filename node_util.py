@@ -51,6 +51,8 @@ class FB_State:
                     tuple(self.upipes),
                     tuple(self.lpipes),
                     ))
+    # unique hash function uses builtin hashing of python string representation
+    # of the state. Clever!
 
     def __hash__(self):
         return hash(repr(self))
@@ -60,13 +62,14 @@ class FB_State:
 
 
 class Node:
-
+    # wrapper for state node, where flapped and cost represent the action and cost
+    # associated with a given node (in relation to its predecessor)
     def __init__(self, state, flapped=None, cost=0):
         self.state = state
         self.flapped = flapped
         self.cost = cost
 
-
+# Get start state
 def getStart():
     state = FB_State()
     state.score = int(0)
