@@ -48,8 +48,55 @@ tenets of the course throughout our work.
 
 \section{Problem Specification}
 
-A clear description of the problem you are solving in both general terms
-and how you've mapped it to a formal problem specification.
+% A clear description of the problem you are solving in both general terms
+% and how you've mapped it to a formal problem specification.
+We will first present an overview of our system's representation of the FB
+environment, before specifying the problem formally for both informed search
+and Q-Learning.\\\\
+\subsection{Parameters of the Flappy Bird World}
+The FB world is fully specified by the following:
+\begin{enumerate}
+    \item The location (in pixel coordinates) of the bird
+    \item The locations of the pipes that the bird (or human player) can see
+    \item The velocity and acceleration vectors of the bird
+    \item The current score of the bird
+    \item \emph{(If deterministic)} The offset in the pipe list that is next going to be generated
+\end{enumerate}
+\subsection{Informed Search}
+In general terms, informed search is applied to FB by representing the FB
+world as a sequence of nodes, each with a full specification of the world's state,
+as outlined above. We define a goal test to ask whether a node's current score
+is equal to the score desired (i.e., the size of the game currently being solved).
+We also define a function to return the successors of a given node. Combined with
+functionality to simulate the game's progress through time given the physical
+attributes of each state, the FB world is represented well as an informed
+search problem. Formally, the game is comprised of:
+\\\\State nodes, each with:
+\begin{enumerate}
+    \item A location $x \in \reals^2$
+    \item A velocity $v \in \reals^2$
+    \item An acceleration $a \in \reals^2$
+    \item A score $c \in \integers$
+    \item A set of pipe locations $P \in (\reals^2)^n$, where $n$ is the
+    number of pipes the bird can see
+\end{enumerate}
+The functions, each operating on a node $s$, with attributes subscripted as above
+\begin{enumerate}
+    \item $G(s) = \mathbb{1}(s_c = C)$, a goal test that returns true if and only if
+    a node's score is equal to the goal score $C$.
+    \item $A(s)$, a function returning the actions available to the agent at a state
+    \item $N(s)$, a function that returns a set of neighbors of the node, along
+    with the action required to get to each.
+    \item $D(s)$, a function returning true if and only if the state represents the
+    ``game over'' state (after a crash).
+\end{enumerate}
+The constants $C$, the ``goal number'' of nodes that codes the complexity of the
+game, and various more mundane constants that denote the number of pixels on the screen
+and such. It should be noted that for cleanliness, we abstracted these away into the
+functions $G, D, A, N$ so that the agent doesn't ever need to interact with them.
+
+
+
 
 
 \section{Approach}
