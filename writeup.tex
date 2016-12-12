@@ -8,13 +8,39 @@
 
 \section{Introduction}
 
-A description of the purpose, goals, and scope of your system or
-empirical investigation.  You should include references to papers you
-read on which your project and any algorithms you used are
-based. Include a discussion of whether you adapted a published
-algorithm or devised a new one, the range of problems and issues you
-addressed, and the relation of these problems and issues to the
-techniques and ideas covered in the course.
+% A description of the purpose, goals, and scope of your system or
+% empirical investigation.  You should include references to papers you
+% read on which your project and any algorithms you used are
+% based. Include a discussion of whether you adapted a published
+% algorithm or devised a new one, the range of problems and issues you
+% addressed, and the relation of these problems and issues to the
+% techniques and ideas covered in the course.
+
+This project was a technical study of the game ``Flappy Bird'' (FB) through the lens
+of artificial intelligence. Using both deterministic and randomized paths,
+we represented FB as both an informed search problem and a Q-Learning process.
+Adopting the obvious end of maximizing the game's score as our agent's learning goal,
+we approached this problem in three phases. First, we adapted an open source version
+of this project into an interface conducive to AI work, redefining the game to be
+comprised of familiar objects like states, goals, rewards, successors, and the other
+necessary underlying factors. Second, we devised an informed search solution to the problem.
+This involved requring the agent to solve a game with deterministic pipes, i.e.,
+to figure out an action set that guides the agent through each pipe successfully.
+We used the A* algorithm in this phase, with carefully designed heuristic that
+served to break the larger problem into subproblems, with the agent only needing
+to find a path between one pair of pipes at a time. The final phase of the project
+was to relax the constraint of determinism in the pipes and to require the agent
+to solve a game ``as it comes''. This involved a shift in paradigm, reforming
+the game as an offline policy learning problem rather than as a search problem.
+Our results were uniformly positive, with the AI-representation of the game serving
+us well, the informed search algorithms able to solve large generated games in
+quasilinear time, and the policy derived from Q-learning successful outperforming
+any reasonable human.\\\\
+This project was a true capstone to our study in this course. From proofs of
+heuristic admissibility in informed search to extensive optimization of the policy
+derivation algorithm in the Q-learning section, we engaged deeply with the core
+tenets of the course throughout our work.
+
 
 \section{Background and Related Work}
 
