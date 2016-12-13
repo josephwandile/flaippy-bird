@@ -481,7 +481,7 @@ if __name__ == '__main__':
         if args['weights']:
             path = 'training/demo.json'
 
-        main(agent=QLearner(import_from=path, export_to='training/test.json', epsilon=None, ld=1, training=True))
+        main(agent=QLearner(import_from=path, export_to='training/weights.json', epsilon=None, ld=1, training=True))
 
     elif args['demo']:
         main(agent=QLearner(import_from='training/demo.json', training=False))

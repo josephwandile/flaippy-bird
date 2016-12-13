@@ -39,7 +39,7 @@ class QLearner:
                     self.q_values = defaultdict(float, json.load(infile))
 
     def _dump_q_values(self):
-	if not self.export_to:
+        if not self.export_to:
             return
 
         with open(self.export_to, 'w') as outfile:
@@ -143,10 +143,11 @@ class QLearner:
         return action
 
     def learn_from_episode(self):
-        if not self.training:
-	    return
 
-	num_actions = len(self.history)
+        if not self.training:
+            return
+
+        num_actions = len(self.history)
         s_ = None  # s_ is the next state in the _update: s, a, s_, r
         for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
             s, a = self.history[t]  # Current state
