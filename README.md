@@ -1,4 +1,4 @@
-# Flaippy Bird
+# Flaippy Bird 101
 
 ![Flappy Bird 101](https://github.com/josephwandile/flaippy-bird/blob/master/assets/101.png)
 
