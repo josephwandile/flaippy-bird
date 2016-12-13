@@ -58,7 +58,7 @@ class QLearner:
             and so on...
 
         """
-        return max(0.05 /(self.episodes/40 + 1.0), 0.005) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        return max(0.05 /(self.episodes/40 + 1.0), 0.001) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
         
     def _off_policy(self):
         return random.random() < self._get_current_epsilon()
