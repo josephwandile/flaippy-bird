@@ -39,6 +39,9 @@ class QLearner:
                     self.q_values = defaultdict(float, json.load(infile))
 
     def _dump_q_values(self):
+	if not self.export_to:
+            return
+
         with open(self.export_to, 'w') as outfile:
             dump = json.dumps(self.q_values, sort_keys=True, indent=2, separators=(',', ': '))
             outfile.write(dump)
@@ -61,6 +64,9 @@ class QLearner:
         return max(0.05 /(self.episodes + 1.0), 0.00001) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
         
     def _off_policy(self):
+        if not self.training:
+            return False
+
         return random.random() < self._get_current_epsilon()
 
     def _get_q_value(self, state, action):
