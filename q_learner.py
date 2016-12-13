@@ -58,8 +58,8 @@ class QLearner:
             and so on...
 
         """
-        return max(0.05 /(self.episodes + 1.0), 0.005) if (not self.epsilon == 0.0) else self.epsilon
-
+        return max(0.05 /(self.episodes + 1.0), 0.005) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        
     def _off_policy(self):
         return random.random() < self._get_current_epsilon()
 
@@ -99,10 +99,9 @@ class QLearner:
 
         return 0.0
         """
-        if not state:
-            return self.penalty
-
-        return self.reward
+        if not state:  # Previous state preceded a crash
+            return -1000.0
+        return 1.0
 
     def _update(self, state, action, next_state, reward):
         if not self.training:
