@@ -12,7 +12,7 @@ class QLearner:
     def __init__(self, import_from=None, export_to=None, ld=1, epsilon=None, penalty=-1000.0, reward=1.0, training=True):
 
         self.epsilon = epsilon  # off-policy rate
-        self.alpha = 0.3        # learning rate
+        self.alpha = 0.7        # learning rate
         self.gamma = 1.0        # discount
         self.ld = ld            # lambda
         self.penalty = penalty
