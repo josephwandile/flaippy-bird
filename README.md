@@ -1,6 +1,6 @@
 # Flaippy Bird
 
-![alt text](https://github.com/josephwandile/flaippy-bird/tree/master/assets.png "Flappy Bird 101!")
+![Flappy Bird 101](https://github.com/josephwandile/flaippy-bird/tree/master/assets.png)
 
 ## Getting started
 * Make sure you've got PyGame 1.9+ installed and are running Python 2.7+. You may also need to update your PC's package of libpng.
