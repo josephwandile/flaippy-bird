@@ -39,6 +39,9 @@ class QLearner:
                     self.q_values = defaultdict(float, json.load(infile))
 
     def _dump_q_values(self):
+	if not self.export_to:
+            return
+
         with open(self.export_to, 'w') as outfile:
             dump = json.dumps(self.q_values, sort_keys=True, indent=2, separators=(',', ': '))
             outfile.write(dump)
