@@ -64,6 +64,9 @@ class QLearner:
         return 0.0 if not self.epsilon else self.epsilon
 
     def _off_policy(self):
+        if not self.training:
+            return False
+
         return random.random() < self._get_current_epsilon()
 
     def _get_q_value(self, state, action):

@@ -451,6 +451,7 @@ def get_hitmask(image):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Play FB, solve with informed search, or teach the bird with RL.')
+    parser.add_argument('-d', '--demo', help='See a demo of the TD-learner', action='store_true')
     parser.add_argument('-s', '--search', help='Solve with A*, then watch.', action='store_true')
     parser.add_argument('-l', '--learn', help='Solve with TD-lambda, then watch.', action='store_true')
     parser.add_argument('-w', '--weights', help='Upload previous solution', action='store_true')
@@ -481,6 +482,9 @@ if __name__ == '__main__':
             path = 'training/demo.json'
 
         main(agent=QLearner(import_from=path, export_to='training/ties.json', epsilon=None, ld=1, training=True))
+
+    elif args['demo']:
+        main(agent=QLearner(import_from='training/read_only_demo.json', training=False))
 
     else:
         main()
