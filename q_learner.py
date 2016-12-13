@@ -12,7 +12,7 @@ class QLearner:
     def __init__(self, import_from=None, export_to=None, ld=1, epsilon=None, penalty=-1000.0, reward=1.0, training=True):
 
         self.epsilon = epsilon  # off-policy rate
-        self.alpha = 0.7        # learning rate
+        self.alpha = 0.99        # learning rate
         self.gamma = 1.0        # discount
         self.ld = ld            # lambda
         self.penalty = penalty
@@ -58,7 +58,7 @@ class QLearner:
             and so on...
 
         """
-        return max(0.05 /(self.episodes + 1.0), 0.0005) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        return max(0.05 /(self.episodes/40 + 1.0), 0.005) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
         
     def _off_policy(self):
         return random.random() < self._get_current_epsilon()
