@@ -16,7 +16,7 @@
 ## TODOs
 * Clean up command line args and general IO.
 * `pipes.py` shouldn't exist.
-* Make node_util.py not totally awful.
+* Make `node_util.py` not totally awful.
 * Consolidate and clean up code. A lot is split between multiple files. 
 * Those global variables and constants though... 
 * The Q Learner commits suicide when prospects look grim. Work on getting it to be risky and aim for the gap even when failure is certain.
