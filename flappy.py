@@ -226,7 +226,7 @@ def main_game(movement_info, action_list=None, agent=None):
 
             if agent:
                 agent.learn_from_episode()
-                with open('performance/ties.csv', 'a') as score_keeping:
+                with open('scores7.csv', 'a') as score_keeping:
                     score_keeping.write('{},{}\n'.format(agent.episodes, score))
 
             return {

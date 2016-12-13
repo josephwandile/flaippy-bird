@@ -9,7 +9,7 @@ FALL, FLAP = 0, 1
 
 class QLearner:
 
-    def __init__(self, import_from=None, export_to=None, ld=0, epsilon=None, penalty=-1000.0, reward=1.0, training=True):
+    def __init__(self, import_from=None, export_to=None, ld=1, epsilon=None, penalty=-1000.0, reward=1.0, training=True):
 
         self.epsilon = epsilon  # off-policy rate
         self.alpha = 0.7        # learning rate
@@ -61,8 +61,8 @@ class QLearner:
             and so on...
 
         """
-        return 0.0 if not self.epsilon else self.epsilon
-
+        return max(0.05 /(self.episodes + 1.0), 0.00001) if (not self.epsilon or self.epsilon == 0.0) else self.epsilon
+        
     def _off_policy(self):
         if not self.training:
             return False
@@ -105,9 +105,8 @@ class QLearner:
 
         return 0.0
         """
-        if not state:
+        if not state:  # Previous state preceded a crash
             return self.penalty
-
         return self.reward
 
     def _update(self, state, action, next_state, reward):
