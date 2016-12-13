@@ -1,8 +1,6 @@
 import node_util
 
 
-
-
 class Fringe:
     """Allows for a very (very) pretty abstraction, wherein the implementation
     of graph search doesn't change, the user just decides which fringe type to

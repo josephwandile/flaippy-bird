@@ -111,9 +111,6 @@ class QLearner:
         return self.reward
 
     def _update(self, state, action, next_state, reward):
-        if not self.training:
-            return
-
         q = self._get_q_value(state, action)
         q_ = q + self.alpha * (reward + self.gamma * self._get_value(next_state) - q)
         self._set_q_value(state, action, q_)
@@ -147,7 +144,10 @@ class QLearner:
         return action
 
     def learn_from_episode(self):
-        num_actions = len(self.history)
+        if not self.training:
+	    return
+
+	num_actions = len(self.history)
         s_ = None  # s_ is the next state in the _update: s, a, s_, r
         for t in range(num_actions - 1, -1, -1):  # Update in reverse order to speed up learning
             s, a = self.history[t]  # Current state
